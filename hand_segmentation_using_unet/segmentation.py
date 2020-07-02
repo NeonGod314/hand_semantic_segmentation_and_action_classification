@@ -111,7 +111,6 @@ def show_predictions(dataset, num=1, epoch=0):
             pred_img = pred_img.reshape([128, 128]).astype('uint8')
             print(pred_img.shape)
             # cv2.imshow("predicted image", pred_img)
-            cv2.imwrite('temp.jpg', pred_img)
 
 
 class DisplayCallback(tf.keras.callbacks.Callback):
@@ -123,7 +122,7 @@ class DisplayCallback(tf.keras.callbacks.Callback):
 
 if __name__ == '__main__':
 
-    EPOCHS = 30
+    EPOCHS = 50
     BATCH_SIZE = 64
     images, masks, test_images, test_masks = load_gtea_dataset(test_data=True)
 
@@ -136,7 +135,7 @@ if __name__ == '__main__':
 
     steps_per_epoch = len(images) // EPOCHS
     print("steps per epoch: ", steps_per_epoch, len(images))
-    model_history = model.fit(x=images, y=masks, epochs=EPOCHS, batch_size=BATCH_SIZE, steps_per_epoch=9)
+    model_history = model.fit(x=images, y=masks, epochs=EPOCHS, batch_size=BATCH_SIZE)
 
     predict_dataset = zip(test_images, test_masks)
 
