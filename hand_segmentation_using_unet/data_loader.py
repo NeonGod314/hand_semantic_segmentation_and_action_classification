@@ -4,9 +4,10 @@
 |
 | *Description:* loads dataset
 """
+import os
 import glob
 import numpy as np
-from PIL import Image
+import cv2
 import tensorflow as tf
 
 
@@ -24,38 +25,50 @@ def load_image_train(input_image, input_mask):
         input_mask = tf.image.flip_left_right(input_mask)
 
     input_image, input_mask = normalize(input_image, input_mask)
-    print(input_image.shape, input_mask.shape)
-
     return input_image, input_mask
 
 
-def load_gtea_dataset(ds_path='/Users/subhamsingh/Desktop/gtea_dataset/hand2K_dataset/GTEA/'):
+def load_gtea_dataset(ds_path='/Users/subhamsingh/Desktop/gtea_dataset/hand2K_dataset/GTEA/', test_data = False):
     """
     :param ds_path: path to gtea ds
     :return: loaded orig images and masked images(np format)
     """
     images_path = glob.glob(ds_path + 'Images/*.jpg')
-    masks_path = glob.glob(ds_path + 'Masks/*.png')
+    masks_path = ds_path + 'Masks/'
 
     images = []
     masks = []
-
-    for img_path, mask_path in zip(images_path, masks_path):
-        images.append(np.asarray(Image.open(img_path).resize((128, 128))))
-        mask_colored = Image.open(mask_path).resize((128, 128))
-        mask_colored = mask_colored.convert("RGB")
-        masks.append(np.asarray(mask_colored))
+    for img_path in images_path:
+        img_file_name = os.path.basename(img_path)
+        mask_path = (masks_path + img_file_name).split('.')[0] + '.png'
+        img = cv2.resize(cv2.imread(img_path), (128, 128))
+        msk = cv2.resize(cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE), (128, 128))
+        ret, msk_binary = cv2.threshold(msk, 20, 255, cv2.THRESH_BINARY)
+        images.append(img)
+        masks.append(msk_binary)
 
     images = np.array(images)
-    images = images.reshape(images.shape[0], 128, 128, 3)
     masks = np.array(masks)
-    masks = masks.reshape(masks.shape[0], 128, 128, 3)
 
-    images, masks = load_image_train(input_image=images, input_mask=masks)
+    # images, masks = load_image_train(input_image=images, input_mask=masks)
 
+    print("\n#### DATA LOADING COMPLETE\n")
+    if test_data:
+        test_images = images[:10]
+        test_masks = masks[:10]
+        return images, masks, test_images, test_masks
     return images, masks
+
 
 
 if __name__ == '__main__':
     img, msk = load_gtea_dataset()
+    print(msk[0].shape)
+    print(msk[0])
+    cv2.imwrite('tmp.jpg', np.asarray(msk[0]))
+    cv2.imwrite('tmp2.jpg', np.asarray(img[0]))
+
+
     assert np.asarray(img).shape == (663, 128, 128, 3)
+    print(np.asarray(msk).shape)
+    assert np.asarray(msk).shape == (663, 128, 128)
