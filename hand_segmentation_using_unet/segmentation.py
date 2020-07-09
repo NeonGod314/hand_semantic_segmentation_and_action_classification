@@ -122,7 +122,7 @@ class DisplayCallback(tf.keras.callbacks.Callback):
 
 if __name__ == '__main__':
 
-    EPOCHS = 50
+    EPOCHS = 80
     BATCH_SIZE = 64
     images, masks, test_images, test_masks = load_gtea_dataset(test_data=True)
 
@@ -134,7 +134,9 @@ if __name__ == '__main__':
         print(layer.name, layer.output_shape)
 
     steps_per_epoch = len(images) // EPOCHS
-    print("steps per epoch: ", steps_per_epoch, len(images))
+    print(tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES))
+    print(tf.trainable_variables())
+    exit()
     model_history = model.fit(x=images, y=masks, epochs=EPOCHS, batch_size=BATCH_SIZE)
 
     predict_dataset = zip(test_images, test_masks)
