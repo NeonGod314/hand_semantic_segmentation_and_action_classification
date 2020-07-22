@@ -13,7 +13,7 @@ def generator(mask, img, save_path):
 
 
 if __name__ == '__main__':
-    all_orig_images = glob.glob(project_dir + 'version_1_predictions/predict_img_*.jpg')
+    all_orig_images = glob.glob(project_dir + './predict_img_*.jpg')
 
     for img_path in all_orig_images:
         img = cv2.imread(img_path)
@@ -22,4 +22,4 @@ if __name__ == '__main__':
 
         img_num = img_path.split('_img_')[1].split('.0')[0]
 
-        generator(mask=msk, img=img, save_path=project_dir + 'version_1_predictions/seg_' + str(img_num) + '.jpg')
+        generator(mask=msk, img=img, save_path=project_dir + 'version_1_predictions_80_epochs/seg_' + str(img_num) + '.jpg')
